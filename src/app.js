@@ -1,33 +1,37 @@
-console.log('hello world!'); 
+"use strict"
 const express = require("express");
+const {AdminAuth,userAuth} = require("./middleware/auth");
 const app = express();
 const PORT = 7777;
 app.listen(PORT,(req,res)=>{
     console.log(`Listening at port: ${PORT}`);
 });
 
-// app.use("/user",(req,res)=>{
-//     res.send('Use will match will all method and because of order it will run always');
-// })
 
-app.get("/user",(req,res)=>{
-    res.send({name:"Sonal",age:21});
+/*Erorr handling 2 ways
+1)Always use try and catch block to handle error 
+2)error handling by using app.use()
+*/
+app.get("/user",userAuth,(req,res)=>{
+    try{
+        throw new Error("helloooo");
+        res.send({name:"Sonal",age:21});
+    }catch(err){
+        res.status(500).send("Error Occured")
+    }
 })
-app.post("/user",(req,res)=>{
-    res.send("POST: User Updated Successfully");
+
+/*Middleware*/
+app.use("/admin",AdminAuth);
+
+app.get("/admin/getAllDetails",(req,res,next)=>{
+    console.log("getAllDetails");
+    res.send("All details fetch successfully");
 })
-app.delete("/user",(req,res)=>{
-    res.send("Delete: User deleted Successfully");
-})
-app.put("/user",(req,res)=>{
-    res.send("PUT: User whole object updated Successfully");
-})
-app.patch("/user",(req,res)=>{
-    res.send("PATCH: User specific details updated Successfully");
-})
-app.head("/user",(req,res)=>{
-    res.send("HEAD: used to optimize web performance, improve security, and enhance user experience. Like GET but server not return message body in response");
-})
-app.options("/user",(req,res)=>{
-    res.send("OPTIONS:OPTIONS HTTP method requests permitted communication options for a given URL or server");
+
+
+app.use("/",(err,req,res,next)=>{
+    if(err){
+     res.status(500).send("Something Went Wrong")
+    }
 })
