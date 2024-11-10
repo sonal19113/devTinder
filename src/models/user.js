@@ -20,10 +20,18 @@ const userSchema = new mongoose.Schema({
         type : String,
         enum: ['Male', 'Female', 'Other'],
     },
-    createdDate :{
-       type: Date, 
-       default: Date.now 
+    photoUrl:{
+        type : String,    
+    },
+    skill:{
+        type: [String]
+    },
+    about:{
+        type : String, 
+        default:"This is default About for the user"
     }
+},{
+    timestamps : true
 })
 
 const User = mongoose.model("User",userSchema);

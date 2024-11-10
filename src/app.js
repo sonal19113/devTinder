@@ -102,7 +102,6 @@ app.patch("/user",async(req,res)=>{
 
 //Feed API- get all the users from the db for feed
 app.get("/feed",async(req,res)=>{
-
     try{
         const users = await User.find({});
         res.send(users);
