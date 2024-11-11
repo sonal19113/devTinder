@@ -8,20 +8,36 @@ const userSchema = new mongoose.Schema({
         type : String
     },
     emailId :{
-        type : String
+        type : String,
+        required:true,
+        unique:true,
+        trim:true,
+        minLength:8,
+        index: true,
+        validate(value) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!regex.test(value)){
+                throw new Error("Invalid Email Address");
+            };
+        }
     },
     password :{
-        type : String
+        type : String,
+        required:true,
     },
     age :{
         type : Number
     },
     gender :{
         type : String,
+        required:true,
         enum: ['Male', 'Female', 'Other'],
     },
     photoUrl:{
-        type : String,    
+        type : String, 
+        default: function(){
+            return this.gender ==='Female' ? "":"";
+        }
     },
     skill:{
         type: [String]
