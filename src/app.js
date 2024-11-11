@@ -2,6 +2,8 @@ const express = require("express");
 const path = require('path');
 const {adminAuth, userAuth} = require("./middleware/auth");
 const { connectDB } = require("./config/database");
+const { validateSignUpData } = require("./utils/validation");
+const { passwordHash } = require("./utils/encryption");
 const User = require("./models/user");
 const app = express();
 const PORT = 5000;
@@ -39,14 +41,40 @@ app.use(express.json());
 // })
 app.post("/signup", async (req,res)=>{
     try{
-        const user = new User(req.body);
-        console.log(req.body);
+
+        validateSignUpData(req.body);
+        const {firstName,lastName,emailId,password,age,gender,phone,skill} = req.body;
+        const passwordHashString = await passwordHash(password);
+        // console.log(passwordHashString);
+        const user = new User({firstName,
+            lastName,
+            emailId,
+            password : passwordHashString,
+            age,
+            gender,
+            phone,
+            skill
+        });
         await user.save();
         res.send("User Saved Successfully");
     }catch(err){
-        res.status(400).send(`Unable to Upload Data ${err.message}`);
+        res.status(400).send(`Error: ${err.message}`);
     }
 });
+
+/*
+http://localhost:5000/signup
+{
+    "firstName": "Sonal",
+    "lastName": "Kumari",
+    "emailId": "sonal.kumari@gmail.com",
+    "password": "Sonal@123",
+    "age": 24,
+    "gender": "Female",
+    "phone":"9999999999",
+    "skill":["javaScript","node.js","acting","dancing"]
+}
+ */
 
 
 //get user by email
