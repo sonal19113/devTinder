@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require('path');
 const {adminAuth, userAuth} = require("./middleware/auth");
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
@@ -14,6 +15,8 @@ connectDB().then(()=>{
     console.log(`Something went wrong ${err}`);
 })
 
+// console.log(`path::::::::::${path.join(__dirname, 'public')}`)
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());
 
@@ -37,6 +40,7 @@ app.use(express.json());
 app.post("/signup", async (req,res)=>{
     try{
         const user = new User(req.body);
+        console.log(req.body);
         await user.save();
         res.send("User Saved Successfully");
     }catch(err){
@@ -87,16 +91,23 @@ app.delete("/user", async(req,res)=>{
     }
 })
 
-app.patch("/user",async(req,res)=>{
-    const userId = req.body.userId;
+app.patch("/user/:userId",async(req,res)=>{
+    const userId = req.params.userId;
     const data = req.body;
+
     try{
+        const ValidKeys =["firstName","lastName","password","phone","age","skill","about","uploadedImages","photoUrl"];
+        Object.keys(data).forEach(k=>{
+            if(!ValidKeys.includes(k)){ 
+                throw new Error("Invalid Post Data");
+            }
+        });
         // const user = await User.findByIdAndUpdate({_id:userId},data);
-        const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"});
+        const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after",runValidators:true});
         res.send(user)
 
     }catch(err){
-        res.status(400).send("Something went wrong"); 
+        res.status(400).send("Something went wrong:"+err.message); 
     }
 })
 
