@@ -1,6 +1,9 @@
 const mongoose =require("mongoose");
 const validator =require("validator");
+const jwt =require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
+const SECRET = "Asdfg@1234$Qwerty";
 const userSchema = new mongoose.Schema({
     firstName :{
         type : String,
@@ -85,6 +88,13 @@ const userSchema = new mongoose.Schema({
 },{
     timestamps : true
 })
+
+userSchema.methods.getJwtToken = function(){
+    return jwt.sign({ _id : this._id }, SECRET);
+}
+userSchema.methods.checkPassword = async function(passwordInputByUser){
+    return  await bcrypt.compare(passwordInputByUser, this.password);
+}
 
 const User = mongoose.model("User",userSchema);
 

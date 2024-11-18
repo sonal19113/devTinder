@@ -15,6 +15,23 @@ const validateSignUpData = (body)=>{
     }
 }
 
+const validateProfileEditData = (body)=>{
+    const allowedFields =["firstName","lastName","gender","about","skill","photoUrl","age"];
+    const isFieldAllowed = Object.keys(body).every((key)=>{
+        return allowedFields.includes(key);
+    })
+    return isFieldAllowed;
+}
+const validateProfileEditPasswordField = (body)=>{
+    const allowedFields =["currentPassword","newPassword"];
+    const isFieldAllowed = Object.keys(body).every((key)=>{
+        return allowedFields.includes(key);
+    })
+    return isFieldAllowed;
+}
+
 module.exports={
-    validateSignUpData
+    validateSignUpData,
+    validateProfileEditData,
+    validateProfileEditPasswordField
 }
